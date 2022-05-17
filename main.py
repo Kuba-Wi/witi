@@ -15,27 +15,45 @@ def get_bits_pos(num):
 
     return bits_list
 
-tasks = [Task(2, 3, 4), Task(4, 3, 3), Task(1, 4, 5), Task(3, 2, 2)]
-results = [0]
+# tasks = [Task(2, 3, 4), Task(4, 3, 3), Task(1, 4, 5), Task(3, 2, 2)]
+tasks = [Task(1, 2, 748),
+         Task(46, 5, 216),
+         Task(5, 7, 673),
+         Task(93, 4, 514),
+         Task(83, 1, 52),
+         Task(53, 7, 7),
+         Task(38, 1, 413), 
+         Task(68, 6, 922),
+         Task(84, 5, 91),
+         Task(65, 4, 694)]
+
+F = [0]
 for i in range(1, 2**len(tasks)):
-    results.append(-1)
+    F.append(-1)
 
-
-print(results)
-
-get_bits_pos(13)
 
 def add_result(num):
-    bits_pos = get_bits_pos(num)
-    if len(bits_pos) == 1:
-        results[num] = tasks[bits_pos[0]].w * (tasks[bits_pos[0]].p - tasks[bits_pos[0]].d)
-        if results[num] < 0:
-            results[num] = 0
+    tasks_ids = get_bits_pos(num)
+    if len(tasks_ids) == 1:
+        F[num] = max(tasks[tasks_ids[0]].w * (tasks[tasks_ids[0]].p - tasks[tasks_ids[0]].d), 0)
         return
 
-    for pos in bits_pos:
-        if results[2**pos] == -1:
-            add_result(2**pos)
-        elif results[num - 2**pos] == -1:
-            add_result(num - 2**pos)
+    C = 0
+    for t_id in tasks_ids:
+        C += tasks[t_id].p
+
+    for t_id in tasks_ids:
+        if F[2**t_id] == -1:
+            add_result(2**t_id)
+        if F[num - 2**t_id] == -1:
+            add_result(num - 2**t_id)
+
+        K = max((C - tasks[t_id].d) * tasks[t_id].w, 0)
+
+        if (F[num] == -1) or (F[num - 2**t_id] + K < F[num]):
+            F[num] = F[num - 2**t_id] + K
+
+
+add_result(2**len(tasks) - 1)
+print(F[-1])
             
